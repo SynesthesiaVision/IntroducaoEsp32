@@ -12,7 +12,7 @@ void setup()
 Serial.begin(115200); //inicializa o monitor serial
 pinMode(button, INPUT); //configura o pino button do ESP32 como input
 
-attachInterrupt(button, contar, RISING); /*função que define que o pino 14, do botão,  vai gerar uma interrupção quando for solto após pressionado(borda de descida) e assim executar a função changeLed()*/
+attachInterrupt(button, contar, FALLING); /*função que define que o pino 14, do botão,  vai gerar uma interrupção quando for solto após pressionado(borda de descida) e assim executar a função changeLed()*/
 }
  
 void loop()
