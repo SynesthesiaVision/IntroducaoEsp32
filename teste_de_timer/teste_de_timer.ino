@@ -1,30 +1,35 @@
-#define LED 21
-#define BUTTON 2 // Altere para o pino ao qual o botão está conectado
+#define LED 12
+#define BUTTON 2
 
+//Instanciação do timer
 hw_timer_t *My_timer = NULL;
-volatile bool buttonPressed = false;
 
-void IRAM_ATTR onTimer() {
-  digitalWrite(LED, HIGH);  // Liga a LED
+//Função chamada pela interrupção
+void IRAM_ATTR onTimer()
+{
+     digitalWrite(LED, HIGH); // Liga a LED
 }
 
-void setup() {
-  pinMode(LED, OUTPUT);
-  pinMode(BUTTON, INPUT_PULLUP); // Configura o botão com pull-up interno
+//Inicialização
+void setup()
+ {
+     pinMode(LED, OUTPUT);
+     digitalWrite(LED, LOW);
+     pinMode(BUTTON, INPUT_PULLUP);
+    //Timer definido com clock dividido por  80  =  1MHz
+     My_timer = timerBegin(0, 80, true);
 
-  My_timer = timerBegin(0, 80, true);
-  timerAttachInterrupt(My_timer, &onTimer, true);
+    //Executa onTimer ao chegar no limite do tempo
+    timerAttachInterrupt(My_timer, &onTimer, true);
 
-  attachInterrupt(digitalPinToInterrupt(BUTTON), [] {
-    buttonPressed = true;
-  }, FALLING);
+    //Define o tempo  de espera em 3 segundos
+    timerAlarmWrite(My_timer, 3000000, true); 
 }
-
-void loop() {
-  if (buttonPressed) {
-    delay(3000);  // Espera 5 minutos (300.000 milissegundos) antes de ligar a LED
-    timerAlarmEnable(My_timer);  // Ativa o temporizador para ligar a LED
-    buttonPressed = false;  // Reseta a flag do botão para evitar repetição
-  }
-  // Aqui você pode adicionar lógica adicional enquanto a LED está ligada, se necessário
+//Loop com a função de monitorar um botão
+void loop()
+ {
+     if (!digitalRead(BUTTON))
+     { 
+           timerAlarmEnable(My_timer); 
+       } 
 }
