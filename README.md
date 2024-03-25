@@ -1,11 +1,15 @@
 # Apostila Introdução ao ESP32
 
-<p>O presente repositório conta com os códigos exemplos necessários para a utilização da apostila de introdução ao ESP32 nos seguintes tópicos:</p>
+<h2>O presente repositório conta com os códigos exemplos necessários para a utilização da apostila de introdução ao ESP32 nos seguintes tópicos:</h2>
 
-<ul>
-  <li> Pinos do ESP32</li>
+<ol>
+  <li> Escolhendo os pinos</li>
   <li> Interrupções</li>
   <li> Timers</li>
-  <li> Deep Sleep</li>
+  <li> Execução em dual core</li>
   <li> Função touch</li>
-</ul>
+  <li> Sleep modes</li>
+</ol>
+
+<img width = "500" src="https://github.com/SynesthesiaVision/IntroducaoEsp32/blob/main/Apostila%20Guia%20ESP32.png">
+
