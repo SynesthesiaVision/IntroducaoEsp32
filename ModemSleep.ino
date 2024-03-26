@@ -1,31 +1,99 @@
-//O presente código é apenas um exemplo de como acessar o modem sleep
-
-void rf_on(){
-    //Função de inicializar o WiFi do chip
-    bool bye = WiFi.setSleep(false);
-    WiFi.mode(WIFI_STA);
-    vTaskDelay(pdMS_TO_TICKS(30));
-    WiFi.begin(wifiConfig.ssid, wifiConfig.passwd);
+#include <WiFi.h>
+#include <BluetoothSerial.h>
+#include "driver/adc.h"
+#include <esp_bt.h>
+ 
+#define STA_SSID "<YOUR-SSID>"
+#define STA_PASS "<YOUR-PASSWD>"
+ 
+BluetoothSerial SerialBT;
+ 
+void setModemSleep();
+void wakeModemSleep();
+ 
+void setup() {
+    Serial2.begin(115200);
+ 
+    while(!Serial2){delay(500);}
+ 
+    SerialBT.begin("ESP32test"); //Bluetooth device name
+    SerialBT.println("START BT");
+ 
+    Serial2.println("START WIFI");
+    WiFi.begin(STA_SSID, STA_PASS);
+ 
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
+        Serial2.print(".");
     }
-    Serial.println("Connected to WiFi");
+ 
+    Serial2.println("");
+    Serial2.println("WiFi connected");
+    Serial2.println("IP address: ");
+    Serial2.println(WiFi.localIP());
+ 
+    setModemSleep();
+    Serial2.println("MODEM SLEEP ENABLED FOR 5secs");
 }
-
-void rf_off(){
-    //Função para desativar o WiFi
-    bool bye = WiFi.disconnect(true);
-    WiFi.mode(WIFI_OFF);
+ 
+//void loop() {}
+unsigned long startLoop = millis();
+bool started = false;
+void loop() {
+    if (!started && startLoop+5000<millis()){
+        // Not use delay It has the own policy
+        wakeModemSleep();
+        Serial2.println("MODEM SLEEP DISABLED");
+        started = true;
+    }
+}
+ 
+void disableWiFi(){
+    adc_power_off();
+    WiFi.disconnect(true);  // Disconnect from the network
+    WiFi.mode(WIFI_OFF);    // Switch WiFi off
+    Serial2.println("");
+    Serial2.println("WiFi disconnected!");
+}
+void disableBluetooth(){
+    // Quite unusefully, no relevable power consumption
     btStop();
-    bye = WiFi.setSleep(true); 
-    vTaskDelay(pdMS_TO_TICKS(100));
+    Serial2.println("");
+    Serial2.println("Bluetooth stop!");
 }
-
-void setup(){
-//procedimentos de inicialização
+ 
+void setModemSleep() {
+    disableWiFi();
+    disableBluetooth();
+    setCpuFrequencyMhz(40);
+    // Use this if 40Mhz is not supported
+    // setCpuFrequencyMhz(80);
 }
-
-void loop(){
-//código a ser executado
+ 
+void enableWiFi(){
+    adc_power_on();
+    delay(200);
+ 
+    WiFi.disconnect(false);  // Reconnect the network
+    WiFi.mode(WIFI_STA);    // Switch WiFi off
+ 
+    delay(200);
+ 
+    Serial2.println("START WIFI");
+    WiFi.begin(STA_SSID, STA_PASS);
+ 
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial2.print(".");
+    }
+ 
+    Serial2.println("");
+    Serial2.println("WiFi connected");
+    Serial2.println("IP address: ");
+    Serial2.println(WiFi.localIP());
+}
+ 
+void wakeModemSleep() {
+    setCpuFrequencyMhz(240);
+    enableWiFi();
 }
