@@ -1,9 +1,4 @@
-#define LED 12
-
-
 hw_timer_t * timer = NULL;
-
-
 
 void cb_timer(){
     unsigned int counter = 1;
